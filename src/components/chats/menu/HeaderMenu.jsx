@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
 import Menu from '@mui/material/Menu';
@@ -12,16 +12,44 @@ import Tooltip from '@mui/material/Tooltip';
 import PersonAdd from '@mui/icons-material/PersonAdd';
 import Settings from '@mui/icons-material/Settings';
 import Logout from '@mui/icons-material/Logout'
+import { AccountContext } from '../../context/AccountProvider';
 
-function HeaderMenu() {
+function HeaderMenu({ logout }) {
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const [isTrue, setIstrue] = useState("Dark Mode")
+    const [checked, setChecked] = useState(true);
+    const { setModes, socket, accounts } = useContext(AccountContext)
     const open = Boolean(anchorEl);
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
+
+
+
+
+    const handleChange = () => {
+        const newMode = checked ? "light Mode" : "Dark Mode";
+        setIstrue(newMode);
+        setModes(newMode);
+        setChecked(!checked);
+    };
+    console.log(isTrue);
+
+
+    useEffect(() => {
+        document.documentElement.setAttribute('data-theme', isTrue === 'Light Mode' ? 'light' : 'dark');
+    }, [isTrue, setModes]);
+
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    const handleLogout = () => {
+        if (socket.current) {
+            socket.current.emit('logout', accounts.sub)
+        }
+        logout();
+    }
     return (
         <>
             <React.Fragment>
@@ -72,7 +100,7 @@ function HeaderMenu() {
                                 bgcolor: '#222e35',
                                 transform: 'translateY(-50%) rotate(45deg)',
                                 zIndex: 0,
-                            }, 
+                            },
                         },
                     }}
                     transformOrigin={{ horizontal: 'right', vertical: 'top' }}
@@ -80,41 +108,60 @@ function HeaderMenu() {
                 >
 
                     <MenuItem sx={{
-                        paddingBottom: '10px' ,'&:hover': {
+                        paddingBottom: '10px', '&:hover': {
                             backgroundColor: '#111b21', // Change background color on hover
-                             
-                        }, }} onClick={handleClose}>
-                            New Community
-                        </MenuItem>
-                    <MenuItem sx={{ paddingBottom: '10px' ,'&:hover': {
+
+                        },
+                    }} onClick={handleClose}>
+                        New Community
+                    </MenuItem>
+                    <MenuItem sx={{
+                        paddingBottom: '10px', '&:hover': {
                             backgroundColor: '#111b21', // Change background color on hover
-                             
-                        }, }} onClick={handleClose}>
+
+                        },
+                    }} onClick={handleClose}>
                         Starred messages
                     </MenuItem>
-                    <MenuItem sx={{ paddingBottom: '10px' ,'&:hover': {
+                    <MenuItem sx={{
+                        paddingBottom: '10px', '&:hover': {
                             backgroundColor: '#111b21', // Change background color on hover
-                             
-                        }, }} onClick={handleClose}>
+
+                        },
+                    }} onClick={handleClose}>
                         Select chats
                     </MenuItem>
-                    <MenuItem sx={{ paddingBottom: '10px' ,'&:hover': {
+                    <MenuItem sx={{
+                        paddingBottom: '10px', '&:hover': {
                             backgroundColor: '#111b21', // Change background color on hover
-                             
-                        }, }} onClick={handleClose}>
+
+                        },
+                    }} onClick={handleClose}>
                         Settings
                     </MenuItem>
-                    <MenuItem sx={{ paddingBottom: '10px' ,'&:hover': {
+                    <MenuItem sx={{
+                        paddingBottom: '10px', '&:hover': {
                             backgroundColor: '#111b21', // Change background color on hover
-                             
-                        }, }} onClick={handleClose}>
+
+                        },
+                    }} onClick={handleChange}>
+                        Dark Mode
+                    </MenuItem>
+                    <MenuItem sx={{
+                        paddingBottom: '10px', '&:hover': {
+                            backgroundColor: '#111b21', // Change background color on hover
+
+                        },
+                    }} onClick={handleLogout}>
                         Log out
                     </MenuItem>
                     <Divider />
-                    <MenuItem sx={{ paddingBottom: '10px' ,'&:hover': {
+                    <MenuItem sx={{
+                        paddingBottom: '10px', '&:hover': {
                             backgroundColor: '#111b21', // Change background color on hover
-                             
-                        }, }} onClick={handleClose}>
+
+                        },
+                    }} onClick={handleClose}>
 
                         Get Whatsapp for Windows
                     </MenuItem>

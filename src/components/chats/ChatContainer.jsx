@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import SideBar from './SideBar'
 import ChatBar from './ChatBar'
 import ProfilePage from '../user/ProfilePage'
@@ -8,9 +8,12 @@ import { AccountContext } from '../context/AccountProvider'
 
 function ChatContainer() {
 
-    const { person } = useContext(AccountContext)
+    const { person, isChatOpen } = useContext(AccountContext)
+
 
     console.log(person)
+
+
     return (
         <>
             <section className='chat-container '>
@@ -18,8 +21,8 @@ function ChatContainer() {
                 <SideBar />
 
 
-              
-                {Object.keys(person).length  ? <ChatBar /> : <EmptyChatDisplay />}
+
+                {Object.keys(person).length && isChatOpen ? <ChatBar /> : <EmptyChatDisplay />}
 
 
 

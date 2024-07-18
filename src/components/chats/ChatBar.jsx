@@ -1,31 +1,76 @@
 
-import { Avatar, IconButton } from '@mui/material'
+import { Avatar, Dialog, DialogContent, IconButton } from '@mui/material'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Search } from '@mui/icons-material';
-import React, { useContext, useEffect, useState } from 'react'
-import { getUsers } from '../../service/api';
+import React, { useContext, useEffect, useRef, useState } from 'react'
+import { getCommunication, getMessages, getUsers, newMessage } from '../../service/api.js';
 import MicIcon from '@mui/icons-material/Mic';
 import AddIcon from '@mui/icons-material/Add';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import { AccountContext } from '../context/AccountProvider';
 import PersonalChatMenu from './menu/PersonalChatMenu';
+import Picker from 'emoji-picker-react';
+import { formatDate } from '../../utils/common-utils.js';
+import ChatBarMenu from './menu/ChatBarMenu.jsx';
+
 
 function ChatBar() {
 
-    const { person } = useContext(AccountContext)
-    console.log(person)
-
-
-
-
+    const { accounts, person, activeUsers, Socket } = useContext(AccountContext)
     const [users, setUses] = useState({})
+    const [text, setText] = useState('');
+    const [messages, setMessages] = useState([])
+    const [communicate, setCommuniate] = useState({})
+    const [newMessageFlag, setNewMessageFlag] = useState(false)
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const [isOnline, setIsOnline] = useState(false);
+    const [showStatus, setShowStatus] = useState(false);
+    const [File, setFile] = useState();
+    const [incommingMessage, setIncommingMessage] = useState(null);
 
 
-    console.log(person);
+
+
+    const emojiButtonRef = useRef(null);
+    const chatEndRef = useRef(null);
+
+    const currentUserId = accounts.sub
+
+    useEffect(() => {
+        if (Socket && Socket.current) {
+            Socket.current.on('getMessage', (data) => {
+                if (data.senderID !== currentUserId) {
+                    setMessages((prev) => [...prev, { ...data, createdAt: Date.now() }]);
+                }
+            });
+        }
+    }, [Socket, currentUserId]);
+
+
+    useEffect(() => {
+        const getCommunicationDetails = async () => {
+            let data = await getCommunication
+                ({
+                    senderId: accounts.sub,
+                    reciverId: person.sub
+                })
+            console.log(data);
+            setCommuniate(data)
+        }
+        person.sub && getCommunicationDetails();
+
+    }, [newMessageFlag, person.sub, accounts.sub])
+
+    useEffect(() => {
+        incommingMessage && communicate?.members?.includes(incommingMessage.senderId) &&
+            setMessages(prev => [...prev, incommingMessage])
+
+    }, [incommingMessage, communicate])
+
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await person
+                const response = await getUsers(person.sub);
                 setUses(response)
 
             } catch (error) {
@@ -34,6 +79,80 @@ function ChatBar() {
         }
         fetchData()
     }, [])
+
+
+    useEffect(() => {
+        const checkOnlineStatus = () => {
+            const isUserOnline = activeUsers?.find(user => user.sub === person.sub);
+            setShowStatus(false);  // Hide the status before changing it
+            setTimeout(() => {
+                setIsOnline(isUserOnline ? true : false);
+                setShowStatus(true);  // Show the status after a delay
+            }, 1300);  // 1.7 seconds delay
+        };
+        checkOnlineStatus();
+    }, [activeUsers, person.sub]);
+
+
+
+    useEffect(() => {
+        const getMessageDetails = async () => {
+            let data = await getMessages(communicate._id)
+            // console.log(data)
+            setMessages(data)
+
+        }
+        communicate._id && getMessageDetails()
+        scrollToBottom();
+
+    }, [communicate._id, newMessageFlag])
+
+
+    useEffect(() => {
+        scrollToBottom(); // Scroll to the bottom when messages state changes
+    }, [messages]);
+
+    const scrollToBottom = () => {
+        chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+
+
+    const sendText = async (e) => {
+        // console.log(e);
+        const code = e.keycode || e.which;
+
+        if (code === 13 && text.trim()) {
+            let message = {
+                senderID: accounts.sub,
+                reciverID: person.sub,
+                communicationId: communicate._id,
+                type: 'text',
+                text: text,
+                createdAt: Date.now()
+            }
+            // console.log(message);
+            if (Socket && Socket.current) {
+                Socket.current.emit('sendMessage', message);
+                console.log('Message sent:', message);
+            }
+
+            await newMessage(message)
+            setMessages((prev) => [...prev, message]);
+            setText('')
+            setNewMessageFlag(prev => !prev)
+
+        }
+        console.log(newMessageFlag)
+
+    }
+
+
+
+    const onEmojiClick = (emojiObject) => {
+        setText((prevText) => prevText + emojiObject.emoji);
+    };
+
     return (
 
 
@@ -51,7 +170,9 @@ function ChatBar() {
                         <div className="chatbar-username">
                             <p className='username' >{person.name}</p>
 
-                            <p className='user-current-status'>Online</p>
+                            <p className={`user-current-status ${!showStatus ? 'hidden' : ''}`}>
+                                {isOnline ? 'online' : 'offline'}
+                            </p>
                         </div>
 
 
@@ -64,51 +185,67 @@ function ChatBar() {
                         </div>
                         <div className="chat-options">
                             <IconButton>
-                                <MoreVertIcon className="sidebar-icons" />
+                                <ChatBarMenu className="sidebar-icons" />
                             </IconButton>
                         </div>
                     </div>
                 </div>
-                <div className="chatbar-body  p-2">
+                <div className="chatbar-body  p-2 " style={{ overflowY: 'auto', flexGrow: 1 }}>
+
                     <div style={{ marginBottom: '5px' }} className='p-3'>
 
-                        <p className={`p-2 chatbar-message ${true && "chat-reciver"}`} >hey guys my name is neeraj kumar sharma <span>1:04 am</span></p>
-                        <p className={`p-2 chatbar-message ${true && "chat-reciver"}`} >hey guys my name is neeraj kumar sharma <span>1:04 am</span></p>
+                        {messages?.map((message, index) => (
+                            <>
 
-                        <p className='p-2 chatbar-message'>what are you doing here ?</p>
-                        <p className='p-2 chatbar-message'>hey guys my name is neeraj kumar sharma</p>
-                        <p className={`p-2 chatbar-message ${true && "chat-reciver"}`} >hey guys my name is neeraj kumar sharma <span>1:04 am</span></p>
 
-                        <p className='p-2 chatbar-message'>hey guys my name is neeraj kumar sharma</p>
-                        <p className='p-2 chatbar-message'>hey guys my name is neeraj kumar sharma</p>
-                        <p className='p-2 chatbar-message'>hey guys my name is neeraj kumar sharma</p>
-                        <p className={`p-2 chatbar-message ${true && "chat-reciver"}`} >hey guys my name is neeraj kumar sharma <span>1:04 am</span></p>
 
-                        <p className={`p-2 chatbar-message ${true && "chat-reciver"}`} >hey guys my name is neeraj kumar sharma <span>1:04 am</span></p>
+                                <p key={index} className={`p-2 chatbar-message message-enter  ${message?.senderID === currentUserId ? "chat-reciver" : ""}`} >{message.text}  <span>{formatDate(message.createdAt)}</span></p>
 
-                        <p className='p-2 chatbar-message'>hey guys my name is neeraj kumar sharma</p>
-                        <p className={`p-2 chatbar-message ${true && "chat-reciver"}`} >hey guys my name is neeraj kumar sharma <span>1:04 am</span></p>
-                        <p className='p-2 chatbar-message'>hey guys my name is neeraj kumar sharma</p>
+
+                            </>
+                        ))}
+                        <div ref={chatEndRef} />
 
 
                     </div>
 
+
                 </div>
+
+                <Dialog open={showEmojiPicker} onClose={() => setShowEmojiPicker(false)} PaperProps={{
+                    style: {
+                        position: 'relative',
+                        left: 'auto',
+                    },
+                }}
+                    anchorEl={emojiButtonRef.current}>
+
+                    <Picker className='picker' onEmojiClick={onEmojiClick} />
+
+                </Dialog>
 
                 <div className="chatbar-footer d-flex p-2 align-items-center" >
 
                     <div className="more-user-options p-2">
                         {/* <AddIcon className='sidebar-icons' />
                          */}
-                         <PersonalChatMenu/>
+                        <PersonalChatMenu file={File} setFile={setFile} text={text} setText={setText} />
                     </div>
 
                     <div className="user-message-input  p-2 d-flex">
                         <div className="emogy">
-                            <EmojiEmotionsIcon className='sidebar-icons' />
+                            <EmojiEmotionsIcon className='sidebar-icons' sx={{ cursor: 'pointer' }}
+                                onClick={() => setShowEmojiPicker((val) => !val)} />
+
                         </div>
                         <div className="user-input">
-                            <form action="">  <input type="text" placeholder=' Type a message' /></form>
+                            <input
+                                type="text"
+                                placeholder=' Type a message'
+                                onChange={(e) => setText(e.target.value)}
+                                onKeyPress={(e) => sendText(e)}
+                                value={text}
+                            />
                         </div>
                     </div>
 
@@ -116,9 +253,9 @@ function ChatBar() {
                         <MicIcon className='sidebar-icons' />
                     </div>
                 </div>
-            </div>
+            </div >
         </>
     )
 }
 
-export default ChatBar
+export default ChatBar 

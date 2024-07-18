@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { styled } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
 import AppSettingsAltIcon from '@mui/icons-material/AppSettingsAlt';
@@ -17,31 +17,36 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
         padding: theme.spacing(1),
     },
 }));
-function LoginDialogbox() {
+function LoginDialogbox({ client_id }) {
 
 
 
     const [open, setOpen] = React.useState(true);
-    const { setAccount } = useContext(AccountContext)
+    const {  setAccount } = useContext(AccountContext)
     const handleClose = () => {
         setOpen(false);
     };
+
+
     const OnLoginSuccess = async (res) => {
 
 
-      
+
         const decode = jwtDecode(res.credential)
 
         console.log(decode);
         setAccount(decode)
         await addUser(decode)
     }
-      
-      
-       
+
+
+    
     const onLoginError = (res) => {
         console.error(res)
     }
+
+  
+
     return (
         <>
             <section className=' '>

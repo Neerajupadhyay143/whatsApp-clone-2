@@ -1,18 +1,28 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import Drawer from '@mui/material/Drawer';
 import "../../style/profle.css"
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Avatar, Box, IconButton, useMediaQuery } from '@mui/material';
 import { AccountContext } from '../context/AccountProvider';
+import { Tilt } from 'react-tilt'
+
 
 
 function ProfilePage() {
     const [open, setOpen] = React.useState(false);
     const isMobile = useMediaQuery('(max-width:600px)');
-    const { accounts } = useContext(AccountContext)
+    const [selectedFile, setSelectedFile] = useState(null);
+    const { accounts, setAccounts } = useContext(AccountContext)
+    const name = accounts.name;
     const toggleDrawer = (newOpen) => () => {
         setOpen(newOpen);
     };
+
+
+
+
+
+
 
     const DrawerStyle = {
         left: 25,
@@ -26,8 +36,21 @@ function ProfilePage() {
         left: 1, // Adjust left position for mobile view
         top: 22, // Adjust top position for mobile view
         backgroundColor: "#111b21",
-        width: 500, // Adjust width for mobile view
+        height: "93vh",
+        minWidth: 380, // Adjust width for mobile view
     };
+
+    const defaultOptions = {
+        reverse: false,  // reverse the tilt direction
+        max: 35,     // max tilt rotation (degrees)
+        perspective: 1000,   // Transform perspective, the lower the more extreme the tilt gets.
+        scale: 1.1,    // 2 = 200%, 1.5 = 150%, etc..
+        speed: 1000,   // Speed of the enter/exit transition
+        transition: true,   // Set a transition on enter/exit.
+        axis: null,   // What axis should be disabled. Can be X or Y.
+        reset: true,    // If the tilt effect has to be reset on exit.
+        easing: "cubic-bezier(.03,.98,.52,.99)",    // Easing on enter/exit.
+    }
 
     return (
         <div>
@@ -50,10 +73,18 @@ function ProfilePage() {
 
                     </div>
                     <div className="profile-image     p-5">
-                        <Avatar src={accounts?.picture} style={{ boxSizing: 'border-box' }} className='profile-avatar' />
+                        <Tilt options={defaultOptions} style={{ height: 220, width: 220 }} >
+                            <Avatar src={accounts?.picture} style={{ boxSizing: 'border-box' }} className='profile-avatar' />
+                        </Tilt>
+
+                        {/* <input type="file" onChange={handleFileChange} />
+                        <button onClick={handleFileUpload}>Upload</button>
+                        <button onClick={handleProfileImageChange}>Change Profile Image</button> */}
                     </div>
-                    <div className="profile-details p-3">
-                        <p> Your name</p>
+                    <div className="profile-details  p-4">
+                        <p className='title-details  '> Your name</p>
+
+                        <input type="text" value={name} />
 
 
                     </div>

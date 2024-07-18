@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import "../style/style.css"
 import LoginDialogbox from './accounts/LoginDialogbox'
 import Switch from '@mui/material/Switch';
@@ -8,11 +8,12 @@ import { useContext } from 'react';
 import { AccountContext } from './context/AccountProvider';
 
 
-function Messenger() {
+function Messenger({ client_id }) {
     const [isTrue, setIstrue] = useState("Dark Mode")
     const [checked, setChecked] = React.useState(true);
-    const { accounts } = useContext(AccountContext)
+    const { accounts, setAccount } = useContext(AccountContext)
     const { setModes } = useContext(AccountContext)
+
 
 
     const handleChange = (event) => {
@@ -27,7 +28,9 @@ function Messenger() {
     };
 
     document.documentElement.setAttribute('data-theme', isTrue === 'light Mode' ? 'Dark Mode' : 'light Mode');
-    // console.log(accounts)
+
+
+    // console.log(accounts);
 
 
     return (
@@ -66,7 +69,7 @@ function Messenger() {
                     </div>
                 </section>
                 <div className="login-section">
-                    <LoginDialogbox />
+                    <LoginDialogbox client_id={client_id} />
 
 
                 </div></>) : (<>
