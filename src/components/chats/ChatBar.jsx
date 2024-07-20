@@ -57,13 +57,15 @@ function ChatBar() {
             console.log(data);
             setCommuniate(data)
         }
-        person.sub && getCommunicationDetails();
+        person?.sub && getCommunicationDetails();
 
-    }, [newMessageFlag, person.sub, accounts.sub])
+
+
+    }, [newMessageFlag, person?.sub, accounts.sub])
 
     useEffect(() => {
         incommingMessage && communicate?.members?.includes(incommingMessage.senderId) &&
-            setMessages(prev => [...prev, incommingMessage])
+            setMessages(prev => [...prev, incommingMessage]);
 
     }, [incommingMessage, communicate])
 
@@ -77,8 +79,10 @@ function ChatBar() {
                 console.log("error to fetch the personal user data", error.message)
             }
         }
-        fetchData()
-    }, [])
+        if (person?.sub) {
+            fetchData()
+        }
+    }, [person?.sub]);
 
 
     useEffect(() => {
@@ -90,22 +94,25 @@ function ChatBar() {
                 setShowStatus(true);  // Show the status after a delay
             }, 1300);  // 1.7 seconds delay
         };
-        checkOnlineStatus();
-    }, [activeUsers, person.sub]);
+
+        if (person?.sub) {
+            checkOnlineStatus();
+        }
+    }, [activeUsers, person?.sub]);
 
 
 
     useEffect(() => {
         const getMessageDetails = async () => {
-            let data = await getMessages(communicate._id)
+            let data = await getMessages(communicate?._id)
             // console.log(data)
             setMessages(data)
 
         }
-        communicate._id && getMessageDetails()
+        communicate?._id && getMessageDetails()
         scrollToBottom();
 
-    }, [communicate._id, newMessageFlag])
+    }, [communicate?._id, newMessageFlag])
 
 
     useEffect(() => {
@@ -165,10 +172,10 @@ function ChatBar() {
                 <div className='chatbar-header bg-black d-flex justify-content-between align-items-center text-white  p-1' >
                     <div className="left-chatHeader d-flex justify-content-between align-items-center  ">
                         <div className="chat-header-avatar 2">
-                            <Avatar src={person.picture} />
+                            <Avatar src={person?.picture} />
                         </div>
                         <div className="chatbar-username">
-                            <p className='username' >{person.name}</p>
+                            <p className='username' >{person?.name}</p>
 
                             <p className={`user-current-status ${!showStatus ? 'hidden' : ''}`}>
                                 {isOnline ? 'online' : 'offline'}
