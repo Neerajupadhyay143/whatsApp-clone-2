@@ -17,8 +17,9 @@ export const addUser = async (data) => {
 export const getUsers = async () => {
     try {
         let response = await axios.get(`${url}/users`)
+        console.log('Users retrieved:', response.data);
         return response.data
-        // console.log(response.data)
+
     } catch (error) {
         console.log("erroe to get the data from database ", error)
     }
@@ -79,7 +80,7 @@ export const getMessages = async (id) => {
 
 
 
-// ye 
+// ye
 
 // export const updateProfileImage = async (userId, imageUrl) => {
 //     try {
