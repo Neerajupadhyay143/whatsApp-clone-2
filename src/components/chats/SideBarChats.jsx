@@ -16,7 +16,7 @@ import { useMediaQuery } from 'react-responsive';
 function SideBarChats({ searchQueries }) {
 
 
-    const [users, setUsers] = useState([{}])
+    const [users, setUsers] = useState([])
     const { accounts, socket, setActiveUsers, setIsChatOpen, setIsMobileScreen } = useContext(AccountContext)
     const { setPerson } = useContext(AccountContext)
 
