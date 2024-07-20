@@ -16,6 +16,8 @@ export const addUser = async (data) => {
 
 export const getUsers = async () => {
     try {
+        console.log('Fetching users from API...');
+        
         let response = await axios.get(`${url}/users`)
         console.log('Users retrieved:', response.data);
         return response.data

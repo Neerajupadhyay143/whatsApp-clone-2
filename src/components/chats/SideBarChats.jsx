@@ -32,7 +32,12 @@ function SideBarChats({ searchQueries }) {
 
         const fetchData = async () => {
             try {
+                console.log('Fetching users...');
+
                 const response = await getUsers();
+
+                console.log('Response from getUsers:', response);
+
                 if (isMounted) {
                     const filteredUsers = response.filter(user => user.sub !== accounts.sub);
 
