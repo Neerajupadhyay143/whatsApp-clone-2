@@ -5,7 +5,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AccountContext } from '../context/AccountProvider';
-import { getUsers } from '../../service/api';
+import { getUsers } from '../../service/api.js';
 import { selectChat, deselectChat, clearSelectedChats } from '../features/chats/chatSlice.js';
 import { setCommunication } from '../../service/api.js';
 import { useMediaQuery } from 'react-responsive';
