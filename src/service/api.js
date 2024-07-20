@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const url = "http://192.168.29.147:8000";
+const url = "https://localhost:8000";
 
 export const addUser = async (data) => {
 
