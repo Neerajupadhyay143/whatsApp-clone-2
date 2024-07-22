@@ -10,8 +10,8 @@ import { AccountContext } from './context/AccountProvider';
 
 function Messenger({ client_id }) {
     const [isTrue, setIstrue] = useState("Dark Mode")
-    const [checked, setChecked] = React.useState(true);
-    const { accounts, setAccount } = useContext(AccountContext)
+
+    const { accounts, setAccount, checked, setChecked } = useContext(AccountContext)
     const { setModes } = useContext(AccountContext)
 
 

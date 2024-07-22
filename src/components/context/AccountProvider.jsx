@@ -13,11 +13,12 @@ function AccountProvider({ children }) {
     const [isChatOpen, setIsChatOpen] = useState(true);
     const [activeUsers, setActiveUsers] = useState([]);
     const [isMobileScreen, setIsMobileScreen] = useState(false);
+    const [checked, setChecked] = React.useState();
 
     const socket = useRef();
 
     useEffect(() => {
-        socket.current = io('ws://localhost:9000')
+        socket.current = io('http://localhost:9000')
 
         socket.current.on('getusers', (users) => {
             setActiveUsers(users);
@@ -54,6 +55,9 @@ function AccountProvider({ children }) {
 
                     isMobileScreen,
                     setIsMobileScreen,
+
+                    checked,
+                    setChecked,
                 }
             } >
                 {children}

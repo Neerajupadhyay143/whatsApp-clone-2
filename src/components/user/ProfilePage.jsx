@@ -5,6 +5,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Avatar, Box, IconButton, useMediaQuery } from '@mui/material';
 import { AccountContext } from '../context/AccountProvider';
 import { Tilt } from 'react-tilt'
+import { motion } from "framer-motion";
 
 
 
@@ -72,7 +73,20 @@ function ProfilePage() {
                         </div>
 
                     </div>
-                    <div className="profile-image     p-5">
+                    <motion.div
+                        initial={{
+                            x: -500
+                            , opacity: 0,
+                            scale: 1,
+                        }}
+
+                        animate={{
+                            x: 0,
+                            opacity: 1,
+                            scale: 1
+                        }}
+                        transition={{ type: "spring", stiffness: 120 }}
+                        className="profile-image     p-5">
                         <Tilt options={defaultOptions} style={{ height: 220, width: 220 }} >
                             <Avatar src={accounts?.picture} style={{ boxSizing: 'border-box' }} className='profile-avatar' />
                         </Tilt>
@@ -80,7 +94,7 @@ function ProfilePage() {
                         {/* <input type="file" onChange={handleFileChange} />
                         <button onClick={handleFileUpload}>Upload</button>
                         <button onClick={handleProfileImageChange}>Change Profile Image</button> */}
-                    </div>
+                    </motion.div>
                     <div className="profile-details  p-4">
                         <p className='title-details  '> Your name</p>
 

@@ -16,9 +16,8 @@ import { AccountContext } from '../../context/AccountProvider';
 
 function HeaderMenu({ logout }) {
     const [anchorEl, setAnchorEl] = React.useState(null);
-    const [isTrue, setIstrue] = useState("Dark Mode")
-    const [checked, setChecked] = useState(true);
-    const { setModes, socket, accounts } = useContext(AccountContext)
+    // const [isTrue, setIstrue] = useState("Dark Mode")
+    const { setModes, socket, accounts, checked, setChecked } = useContext(AccountContext)
     const open = Boolean(anchorEl);
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -28,17 +27,23 @@ function HeaderMenu({ logout }) {
 
 
     const handleChange = () => {
-        const newMode = checked ? "light Mode" : "Dark Mode";
-        setIstrue(newMode);
-        setModes(newMode);
-        setChecked(!checked);
+
+       
+
+        if (checked) {
+            setChecked(false)
+        }
+        // const newMode = checked ? "light Mode" : "Dark Mode";
+        // setIstrue(newMode);
+        // setModes(newMode);
+        // setChecked(!checked);
     };
-    console.log(isTrue);
 
 
-    useEffect(() => {
-        document.documentElement.setAttribute('data-theme', isTrue === 'Light Mode' ? 'light' : 'dark');
-    }, [isTrue, setModes]);
+
+    // useEffect(() => {
+    //     document.documentElement.setAttribute('data-theme', isTrue === 'Light Mode' ? 'light' : 'dark');
+    // }, [isTrue, setModes]);
 
     const handleClose = () => {
         setAnchorEl(null);
@@ -144,7 +149,7 @@ function HeaderMenu({ logout }) {
                             backgroundColor: '#111b21', // Change background color on hover
 
                         },
-                    }} onClick={handleChange}>
+                    }} onClick={handleChange} >
                         Dark Mode
                     </MenuItem>
                     <MenuItem sx={{
