@@ -64,7 +64,7 @@ function ChatBar() {
     }, [newMessageFlag, person?.sub, accounts.sub])
 
     useEffect(() => {
-        incommingMessage && communicate?.members?.includes(incommingMessage.senderId) &&
+        incommingMessage && communicate?.members?.includes(incommingMessage.senderID) &&
             setMessages(prev => [...prev, incommingMessage]);
 
     }, [incommingMessage, communicate])
@@ -138,16 +138,17 @@ function ChatBar() {
                 text: text,
                 createdAt: Date.now()
             }
+            await newMessage(message)
+            setMessages((prev) => [...prev, message]);
+            setText('')
+            setNewMessageFlag(prev => !prev)
             // console.log(message);
             if (Socket && Socket.current) {
                 Socket.current.emit('sendMessage', message);
                 console.log('Message sent:', message);
             }
 
-            await newMessage(message)
-            setMessages((prev) => [...prev, message]);
-            setText('')
-            setNewMessageFlag(prev => !prev)
+
 
         }
         console.log(newMessageFlag)
