@@ -18,10 +18,16 @@ function AccountProvider({ children }) {
     const socket = useRef();
 
     useEffect(() => {
-        socket.current = io('http://localhost:9000')
+        socket.current = io('ws://localhost:9000')
 
         socket.current.on('getusers', (users) => {
             setActiveUsers(users);
+            console.log(users)
+
+        });
+
+        socket.current.on('connect_error', (err) => {
+            console.error('Connection error:', err);
         });
         return () => {
             socket.current.disconnect();

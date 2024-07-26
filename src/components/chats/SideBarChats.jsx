@@ -59,18 +59,6 @@ function SideBarChats({ searchQueries }) {
 
     }, [accounts.sub, users.length])
 
-    useEffect(() => {
-        socket.current.emit('addusers', accounts);
-
-    }, [accounts])
-
-    useEffect(() => {
-        if (socket.current) {
-            socket.current.on('getusers', (users) => {
-                setActiveUsers(users);
-            });
-        }
-    }, [socket]);
 
 
     const getUser = async (user) => {
@@ -105,6 +93,24 @@ function SideBarChats({ searchQueries }) {
     const searchFilteredUsers = users.filter(user =>
         user.name && user.name.toLowerCase().includes(searchQueries.toLowerCase())
     );
+
+
+    useEffect(() => {
+        socket.current.emit('addUsers', accounts);
+        socket.current.on('getusers', users => {
+            setActiveUsers(users);
+        })
+    }, [accounts, socket])
+
+
+
+    // useEffect(() => {
+    //     if (socket.current) {
+    //         socket.current.on('getusers', (users) => {
+    //             setActiveUsers(users);
+    //         });
+    //     }
+    // }, [socket]);
 
 
     return (

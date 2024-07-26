@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { styled, alpha } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
@@ -22,6 +22,7 @@ import PermMediaIcon from '@mui/icons-material/PermMedia';
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 import Webcam from 'react-webcam';
 import { IconButton } from '@mui/material';
+import { uploadFile } from '../../../service/api.js';
 
 function PersonalChatMenu({ file, setFile, text, setText }) {
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -33,15 +34,33 @@ function PersonalChatMenu({ file, setFile, text, setText }) {
     const open = Boolean(anchorEl);
 
 
+    useEffect(() => {
+        const setImages = async () => {
+            if (file) {
+                const data = new FormData();
+                data.append('name', file.name);
+                data.append('file', file);
+                console.log(data)
+                await uploadFile(data)
+            }
+            return setImages();
+        }
+    }, [file, setFile])
+
+
     // file function code 
-    
+
     const onFileChange = (e) => {
         const selectedFile = e.target.files[0];
+        console.log(e.target.files[0])
+        console.log(selectedFile)
         if (selectedFile) {
             setFile(selectedFile);
             setText(selectedFile.name);
         }
     };
+
+
 
 
     const handleClick = (event) => {
@@ -158,7 +177,8 @@ function PersonalChatMenu({ file, setFile, text, setText }) {
                     <input type='file'
                         id='fileinput'
                         onChange={onFileChange}
-                        style={{ display: 'block' }}
+                        style={{ display: 'none' }}
+
                     />
 
 

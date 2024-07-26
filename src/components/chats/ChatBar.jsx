@@ -16,7 +16,7 @@ import ChatBarMenu from './menu/ChatBarMenu.jsx';
 
 function ChatBar() {
 
-    const { accounts, person, activeUsers, Socket } = useContext(AccountContext)
+    const { accounts, person, activeUsers, socket } = useContext(AccountContext)
     const [users, setUses] = useState({})
     const [text, setText] = useState('');
     const [messages, setMessages] = useState([])
@@ -37,14 +37,14 @@ function ChatBar() {
     const currentUserId = accounts.sub
 
     useEffect(() => {
-        if (Socket && Socket.current) {
-            Socket.current.on('getMessage', (data) => {
-                if (data.senderID !== currentUserId) {
+        if (socket && socket.current) {
+            socket.current.on('getMessage', (data) => {
+                if (data.senderId !== currentUserId) {
                     setMessages((prev) => [...prev, { ...data, createdAt: Date.now() }]);
                 }
             });
         }
-    }, [Socket, currentUserId]);
+    }, [socket, currentUserId]);
 
 
     useEffect(() => {
@@ -63,11 +63,10 @@ function ChatBar() {
 
     }, [newMessageFlag, person?.sub, accounts.sub])
 
-    useEffect(() => {
-        incommingMessage && communicate?.members?.includes(incommingMessage.senderID) &&
-            setMessages(prev => [...prev, incommingMessage]);
 
-    }, [incommingMessage, communicate])
+
+
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -123,11 +122,15 @@ function ChatBar() {
         chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
+    useEffect(() => {
+        incommingMessage && communicate?.members?.includes(incommingMessage.senderID) &&
+            setMessages(prev => [...prev, incommingMessage]);
 
+    }, [incommingMessage, communicate])
 
     const sendText = async (e) => {
-        // console.log(e);
-        const code = e.keycode || e.which;
+
+        const code = e.keyCode || e.which;
 
         if (code === 13 && text.trim()) {
             let message = {
@@ -138,15 +141,16 @@ function ChatBar() {
                 text: text,
                 createdAt: Date.now()
             }
-            await newMessage(message)
-            setMessages((prev) => [...prev, message]);
-            setText('')
-            setNewMessageFlag(prev => !prev)
             // console.log(message);
-            if (Socket && Socket.current) {
-                Socket.current.emit('sendMessage', message);
+            if (socket && socket.current) {
+                socket.current.emit('sendMessage', message);
                 console.log('Message sent:', message);
             }
+            await newMessage(message)
+            // setMessages((prev) => [...prev, message]);
+            setText('')
+            setNewMessageFlag(prev => !prev)
+
 
 
 
@@ -160,6 +164,7 @@ function ChatBar() {
     const onEmojiClick = (emojiObject) => {
         setText((prevText) => prevText + emojiObject.emoji);
     };
+
 
     return (
 

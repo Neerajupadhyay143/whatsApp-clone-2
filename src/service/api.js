@@ -66,30 +66,17 @@ export const getMessages = async (id) => {
 
     }
 }
-// New function to handle image upload
-// export const uploadImage = async (formData) => {
-//     try {
-//         const response = await axios.post(`${url}/upload`, formData, {
-//             headers: { 'Content-Type': 'multipart/form-data' },
-//         });
-//         return response.data;
-//     } catch (error) {
-//         console.log("Error uploading image", error);
-//     }
-// };
+export const uploadFile = async (data) => {
+    try {
+        return await axios.post(`${url}/file/upload`, data);
+
+
+    } catch (error) {
+        console.log("error while uploadFile", error)
+
+    }
+}
 
 
 
 
-
-// ye
-
-// export const updateProfileImage = async (userId, imageUrl) => {
-//     try {
-//         const response = await axios.put(`${url}/api/update-profile-image/${userId}`, { imageUrl });
-//         return response.data;
-//     } catch (error) {
-//         console.error('Error updating profile image:', error);
-//         throw error;
-//     }
-// };
