@@ -9,7 +9,7 @@ import { AccountContext } from './context/AccountProvider';
 
 
 function Messenger({ client_id }) {
-    const [isTrue, setIstrue] = useState("Dark Mode")
+    const [isTrue, setIstrue] = useState("light Mode")
 
     const { accounts, setAccount, checked, setChecked } = useContext(AccountContext)
     const { setModes } = useContext(AccountContext)
@@ -27,7 +27,7 @@ function Messenger({ client_id }) {
         }
     };
 
-    document.documentElement.setAttribute('data-theme', isTrue === 'light Mode' ? 'Dark Mode' : 'light Mode');
+    document.documentElement.setAttribute('data-theme', isTrue === 'Dark Mode' ? 'Dark Mode' : 'light Mode');
 
 
     // console.log(accounts);

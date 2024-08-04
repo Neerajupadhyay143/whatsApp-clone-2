@@ -17,7 +17,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 function MobileScreenChatBox() {
 
-    const { accounts, person, activeUsers, Socket, setIsMobileScreen } = useContext(AccountContext)
+    const { accounts, person, activeUsers, socket, setIsMobileScreen } = useContext(AccountContext)
     const [users, setUses] = useState({})
     const [text, setText] = useState('');
     const [messages, setMessages] = useState([])
@@ -38,14 +38,14 @@ function MobileScreenChatBox() {
     const currentUserId = accounts.sub
 
     useEffect(() => {
-        if (Socket && Socket.current) {
-            Socket.current.on('getMessage', (data) => {
+        if (socket && socket.current) {
+            socket.current.on('getMessage', (data) => {
                 if (data.senderID !== currentUserId) {
                     setMessages((prev) => [...prev, { ...data, createdAt: Date.now() }]);
                 }
             });
         }
-    }, [Socket, currentUserId]);
+    }, [socket, currentUserId]);
 
 
     useEffect(() => {
@@ -63,8 +63,8 @@ function MobileScreenChatBox() {
     }, [newMessageFlag, person.sub, accounts.sub])
 
     useEffect(() => {
-        incommingMessage && communicate?.members?.includes(incommingMessage.senderId) &&
-            setMessages(prev => [...prev, incommingMessage])
+        incommingMessage && communicate?.members?.includes(incommingMessage.senderID) &&
+            setMessages(prev => [...prev, incommingMessage]);
 
     }, [incommingMessage, communicate])
 
@@ -133,13 +133,13 @@ function MobileScreenChatBox() {
                 createdAt: Date.now()
             }
             // console.log(message);
-            if (Socket && Socket.current) {
-                Socket.current.emit('sendMessage', message);
+            if (socket && socket.current) {
+                socket.current.emit('sendMessage', message);
                 console.log('Message sent:', message);
             }
 
             await newMessage(message)
-            setMessages((prev) => [...prev, message]);
+            // setMessages((prev) => [...prev, message]);
             setText('')
             setNewMessageFlag(prev => !prev)
 
@@ -171,7 +171,7 @@ function MobileScreenChatBox() {
                 <div className='chatbar-header bg-black d-flex justify-content-between align-items-center text-white  p-1' >
                     <div className="left-chatHeader d-flex justify-content-between align-items-center  ">
                         <div className="chat-header-avatar 2 d-flex align-items-center justify-content-center ">
-                            <ArrowBackIcon sx={{ margin: '5px', marginRight:'22px', cursor: 'pointer' }} onClick={HandleBackToChat} />
+                            <ArrowBackIcon sx={{ margin: '5px', marginRight: '22px', cursor: 'pointer' }} onClick={HandleBackToChat} />
                             <Avatar src={person.picture} />
                         </div>
                         <div className="chatbar-username">

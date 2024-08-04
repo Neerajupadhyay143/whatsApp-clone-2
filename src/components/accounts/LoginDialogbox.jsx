@@ -22,7 +22,7 @@ function LoginDialogbox({ client_id }) {
 
 
     const [open, setOpen] = React.useState(true);
-    const {  setAccount } = useContext(AccountContext)
+    const { setAccount } = useContext(AccountContext)
     const handleClose = () => {
         setOpen(false);
     };
@@ -40,12 +40,12 @@ function LoginDialogbox({ client_id }) {
     }
 
 
-    
+
     const onLoginError = (res) => {
         console.error(res)
     }
 
-  
+
 
     return (
         <>
@@ -71,11 +71,11 @@ function LoginDialogbox({ client_id }) {
                                 </div>
                             </div>
                             <div className="col-6">
-                                <div className="row">
+                                <div className="row position-relative ">
                                     <div className="right-dialog text-center ">
                                         <img src="../images/QR-code.png" alt="" />
                                     </div>
-                                    <div className=' google-section ' >
+                                    <div className=' google-section  ' >
                                         <GoogleLogin
                                             className="bg-dark"
                                             onSuccess={OnLoginSuccess}

@@ -13,7 +13,10 @@ function AccountProvider({ children }) {
     const [isChatOpen, setIsChatOpen] = useState(true);
     const [activeUsers, setActiveUsers] = useState([]);
     const [isMobileScreen, setIsMobileScreen] = useState(false);
+    const [newMessageFlag, setNewMessageFlag] = useState(false)
     const [checked, setChecked] = React.useState();
+    const [updatedUser, setUpdatedUser] = useState([]);
+
 
     const socket = useRef();
 
@@ -64,6 +67,12 @@ function AccountProvider({ children }) {
 
                     checked,
                     setChecked,
+
+                    newMessageFlag,
+                    setNewMessageFlag,
+
+                    updatedUser,
+                    setUpdatedUser,
                 }
             } >
                 {children}

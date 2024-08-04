@@ -16,17 +16,19 @@ import ChatBarMenu from './menu/ChatBarMenu.jsx';
 
 function ChatBar() {
 
-    const { accounts, person, activeUsers, socket } = useContext(AccountContext)
+    const { accounts, person, activeUsers, socket, newMessageFlag, setNewMessageFlag, setUpdatedUser } = useContext(AccountContext)
     const [users, setUses] = useState({})
     const [text, setText] = useState('');
     const [messages, setMessages] = useState([])
     const [communicate, setCommuniate] = useState({})
-    const [newMessageFlag, setNewMessageFlag] = useState(false)
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [isOnline, setIsOnline] = useState(false);
     const [showStatus, setShowStatus] = useState(false);
     const [File, setFile] = useState();
     const [incommingMessage, setIncommingMessage] = useState(null);
+    const [typingStatus, setTypingStatus] = useState(false);
+    const typingTimeoutRef = useRef(null);
+
 
 
 
@@ -43,8 +45,21 @@ function ChatBar() {
                     setMessages((prev) => [...prev, { ...data, createdAt: Date.now() }]);
                 }
             });
+
+
+            socket.current.on('typing', (data) => {
+                if (data.senderId === person.sub) {
+                    setTypingStatus((prev) => ({ ...prev, [data.senderId]: true }));
+                }
+            });
+
+            socket.current.on('stopTyping', (data) => {
+                if (data.senderId === person.sub) {
+                    setTypingStatus((prev) => ({ ...prev, [data.senderId]: false }));
+                }
+            });
         }
-    }, [socket, currentUserId]);
+    }, [socket, currentUserId, person.sub]);
 
 
     useEffect(() => {
@@ -84,6 +99,12 @@ function ChatBar() {
     }, [person?.sub]);
 
 
+
+
+
+
+
+
     useEffect(() => {
         const checkOnlineStatus = () => {
             const isUserOnline = activeUsers?.find(user => user.sub === person.sub);
@@ -94,10 +115,17 @@ function ChatBar() {
             }, 1300);  // 1.7 seconds delay
         };
 
+
+
         if (person?.sub) {
             checkOnlineStatus();
         }
     }, [activeUsers, person?.sub]);
+
+
+
+
+
 
 
 
@@ -107,11 +135,16 @@ function ChatBar() {
             // console.log(data)
             setMessages(data)
 
+
         }
         communicate?._id && getMessageDetails()
         scrollToBottom();
 
     }, [communicate?._id, newMessageFlag])
+
+
+
+
 
 
     useEffect(() => {
@@ -122,11 +155,18 @@ function ChatBar() {
         chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
+
+
+
     useEffect(() => {
         incommingMessage && communicate?.members?.includes(incommingMessage.senderID) &&
             setMessages(prev => [...prev, incommingMessage]);
 
     }, [incommingMessage, communicate])
+
+
+
+
 
     const sendText = async (e) => {
 
@@ -141,23 +181,32 @@ function ChatBar() {
                 text: text,
                 createdAt: Date.now()
             }
-            // console.log(message);
             if (socket && socket.current) {
                 socket.current.emit('sendMessage', message);
-                console.log('Message sent:', message);
+                socket.current.emit('stopTyping', { senderId: accounts.sub, receiverId: person.sub });
             }
             await newMessage(message)
             // setMessages((prev) => [...prev, message]);
             setText('')
             setNewMessageFlag(prev => !prev)
-
-
-
+            updateUserLastMessageTime(person.sub);
 
         }
         console.log(newMessageFlag)
 
     }
+
+    const updateUserLastMessageTime = (userId) => {
+        setUpdatedUser((prevUsers) => {
+            const updatedUsers = prevUsers.map(user =>
+                user.sub === userId ? { ...user, lastMessageTime: Date.now() } : user
+            );
+            return updatedUsers.sort((a, b) => b.lastMessageTime - a.lastMessageTime);
+        });
+    };
+
+
+
 
 
 
@@ -165,6 +214,23 @@ function ChatBar() {
         setText((prevText) => prevText + emojiObject.emoji);
     };
 
+
+    const handleTyping = (e) => {
+        const code = e.keyCode || e.which;
+        if (code !== 13) {
+            if (!typingStatus[person.sub]) {
+                setTypingStatus((prev) => ({ ...prev, [person.sub]: true }));
+                socket.current.emit('typing', { senderId: accounts.sub, receiverId: person.sub });
+            }
+            clearTimeout(typingTimeoutRef.current);
+            typingTimeoutRef.current = setTimeout(() => {
+                setTypingStatus((prev) => ({ ...prev, [person.sub]: false }));
+                socket.current.emit('stopTyping', { senderId: accounts.sub, receiverId: person.sub });
+            }, 2000); // 2 seconds delay
+        }
+    };
+
+    console.log(typingStatus)
 
     return (
 
@@ -184,8 +250,10 @@ function ChatBar() {
                             <p className='username' >{person?.name}</p>
 
                             <p className={`user-current-status ${!showStatus ? 'hidden' : ''}`}>
-                                {isOnline ? 'online' : 'offline'}
+                                {typingStatus[person.sub] ? 'Typing...' : (isOnline ? 'online' : 'offline')}
                             </p>
+
+
                         </div>
 
 
@@ -255,9 +323,11 @@ function ChatBar() {
                             <input
                                 type="text"
                                 placeholder=' Type a message'
+
                                 onChange={(e) => setText(e.target.value)}
-                                onKeyPress={(e) => sendText(e)}
+                                onKeyPress={sendText}
                                 value={text}
+                                onKeyUp={handleTyping}
                             />
                         </div>
                     </div>
