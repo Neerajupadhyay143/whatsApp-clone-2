@@ -6,7 +6,7 @@ export const addUser = async (data) => {
 
 
     try {
-        await axios.post(`${url}/add`, data)
+        await axios.post(`${url}add`, data)
         console.log(data);
 
     } catch (error) {
