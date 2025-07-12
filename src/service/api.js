@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const url = process.env.BACKEND_URL || "http://localhost:8000";
+const url = process.env.BACKEND_URL 
 
 export const addUser = async (data) => {
 
