@@ -37,16 +37,32 @@ function MobileScreenChatBox() {
 
     const currentUserId = accounts.sub
 
+    // useEffect(() => {
+    //     if (socket && socket.current) {
+    //         socket.current.on('getMessage', (data) => {
+    //             if (data.senderID !== currentUserId) {
+    //                 setMessages((prev) => [...prev, { ...data, createdAt: Date.now() }]);
+    //             }
+    //         });
+    //     }
+    // }, [socket, currentUserId]);
+
     useEffect(() => {
         if (socket && socket.current) {
-            socket.current.on('getMessage', (data) => {
+            const handleIncomingMessage = (data) => {
                 if (data.senderID !== currentUserId) {
                     setMessages((prev) => [...prev, { ...data, createdAt: Date.now() }]);
                 }
-            });
+            };
+
+            socket.current.on('getMessage', handleIncomingMessage);
+
+            // clean up on unmount
+            return () => {
+                socket.current.off('getMessage', handleIncomingMessage);
+            };
         }
     }, [socket, currentUserId]);
-
 
     useEffect(() => {
         const getCommunicationDetails = async () => {
@@ -56,7 +72,7 @@ function MobileScreenChatBox() {
                     reciverId: person.sub
                 })
             console.log(data);
-            setCommuniate(data)
+            setCommuniate(data.communication)
         }
         person.sub && getCommunicationDetails();
 
