@@ -2,13 +2,13 @@ import axios from "axios";
 
 const url = process.env.REACT_APP_BACKEND_URL
 
-console.log("url:", url)
+console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL)
 
 export const addUser = async (data) => {
 
 
     try {
-        await axios.post(`${url}/add`, data)
+        await axios.post(`${url}/add`, data, { withCredentials: false })
         console.log(data);
 
     } catch (error) {
