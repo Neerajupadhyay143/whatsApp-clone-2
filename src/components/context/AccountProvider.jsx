@@ -21,21 +21,23 @@ function AccountProvider({ children }) {
     const socket = useRef();
 
     useEffect(() => {
-        socket.current = io('ws://localhost:9000')
+        socket.current = io(process.env.REACT_APP_SOCKET_URL, {
+            transports: ['websocket', 'polling']
+        });
 
         socket.current.on('getusers', (users) => {
             setActiveUsers(users);
-            console.log(users)
-
+            console.log(users);
         });
 
         socket.current.on('connect_error', (err) => {
             console.error('Connection error:', err);
         });
+
         return () => {
             socket.current.disconnect();
         };
-    }, [])
+    }, []);
 
 
     return (
