@@ -8,15 +8,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import { addUser } from '../../service/api.js';
 import { useContext } from 'react';
 import { AccountContext } from '../context/AccountProvider';
-const BootstrapDialog = styled(Dialog)(({ theme }) => ({
-    '& .MuiDialogContent-root': {
-        padding: theme.spacing(2),
 
-    },
-    '& .MuiDialogActions-root': {
-        padding: theme.spacing(1),
-    },
-}));
 function LoginDialogbox({ client_id }) {
 
 
@@ -31,25 +23,19 @@ function LoginDialogbox({ client_id }) {
     const OnLoginSuccess = async (res) => {
 
 
-
         const decode = jwtDecode(res.credential)
-
         console.log(decode);
         setAccount(decode)
         await addUser(decode)
     }
 
-
-
     const onLoginError = (res) => {
         console.error(res)
     }
-
-
-
+   
     return (
         <>
-            <section className=' '>
+            <section className=''>
                 <div className="container main-container p-5 ">
                     <div className="">
                         <div className="col-12 d-flex p-3    center-container flex-column flex-md-row    ">
@@ -71,17 +57,18 @@ function LoginDialogbox({ client_id }) {
                                 </div>
                             </div>
                             <div className="col-6">
-                                <div className="row position-relative ">
-                                    <div className="right-dialog text-center ">
+                                <div className="row  ">
+                                    <div className="right-dialog text-center position-relative ">
                                         <img src="../images/QR-code.png" alt="" />
+                                        <div className=' google-section  ' >
+                                            <GoogleLogin
+                                                className="bg-dark"
+                                                onSuccess={OnLoginSuccess}
+                                                onError={onLoginError}
+                                            />
+                                        </div>
                                     </div>
-                                    <div className=' google-section  ' >
-                                        <GoogleLogin
-                                            className="bg-dark"
-                                            onSuccess={OnLoginSuccess}
-                                            onError={onLoginError}
-                                        />
-                                    </div>
+
                                 </div>
                             </div>
                         </div>

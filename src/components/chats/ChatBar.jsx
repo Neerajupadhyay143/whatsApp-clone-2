@@ -28,14 +28,8 @@ function ChatBar() {
     const [incommingMessage, setIncommingMessage] = useState(null);
     const [typingStatus, setTypingStatus] = useState(false);
     const typingTimeoutRef = useRef(null);
-
-
-
-
-
     const emojiButtonRef = useRef(null);
     const chatEndRef = useRef(null);
-
     const currentUserId = accounts.sub
 
     useEffect(() => {
@@ -69,13 +63,10 @@ function ChatBar() {
                     senderId: accounts.sub,
                     reciverId: person.sub
                 })
-            console.log(data);
-            setCommuniate(data)
+            console.log(data.communication);
+            setCommuniate(data.communication)
         }
         person?.sub && getCommunicationDetails();
-
-
-
     }, [newMessageFlag, person?.sub, accounts.sub])
 
 
@@ -132,7 +123,7 @@ function ChatBar() {
     useEffect(() => {
         const getMessageDetails = async () => {
             let data = await getMessages(communicate?._id)
-            // console.log(data)
+            console.log(data)
             setMessages(data)
 
 
@@ -239,8 +230,6 @@ function ChatBar() {
 
 
             <div className='chat  d-flex flex-column  bg-dark d-none d-md-flex '>
-
-
                 <div className='chatbar-header bg-black d-flex justify-content-between align-items-center text-white  p-1' >
                     <div className="left-chatHeader d-flex justify-content-between align-items-center  ">
                         <div className="chat-header-avatar 2">
@@ -272,25 +261,16 @@ function ChatBar() {
                     </div>
                 </div>
                 <div className="chatbar-body  p-2 " style={{ overflowY: 'auto', flexGrow: 1 }}>
-
                     <div style={{ marginBottom: '5px' }} className='p-3'>
 
                         {messages?.map((message, index) => (
                             <>
-
-
-
-                                <p key={index} className={`p-2 chatbar-message message-enter  ${message?.senderID === currentUserId ? "chat-reciver" : ""}`} >{message.text}  <span>{formatDate(message.createdAt)}</span></p>
-
-
+                                <p key={index} className={`p-2 chatbar-message message-enter  ${message?.senderID === currentUserId ? "chat-reciver" : ""}`} >{message.text}  <span>{formatDate(message.createdAt)}</span>
+                                </p>
                             </>
                         ))}
                         <div ref={chatEndRef} />
-
-
                     </div>
-
-
                 </div>
 
                 <Dialog open={showEmojiPicker} onClose={() => setShowEmojiPicker(false)} PaperProps={{

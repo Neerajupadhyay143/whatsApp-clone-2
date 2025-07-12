@@ -42,8 +42,6 @@ function SideBar() {
 
                 (<>
                     <div className="sidebar d-flex flex-column">
-
-
                         <div className="sidebar-header d-flex justify-content-between align-items-center p-1   text-white ">
                             {/* <Avatar src={accounts?.picture} /> */}
                             <ProfilePage />
@@ -57,8 +55,6 @@ function SideBar() {
                                 <IconButton className='sidebar-icons-button'>
                                     <MapsUgcIcon className='sidebar-icons' />
                                 </IconButton>
-
-
                                 <HeaderMenu logout={handleLogout} />
 
                             </div>
@@ -80,10 +76,6 @@ function SideBar() {
                         </div>
                         <div className="sidebar-chats d-flex flex-column">
                             <SideBarChats searchQueries={searchQueries} />
-
-
-
-
 
                         </div>
                     </div>

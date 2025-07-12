@@ -5,7 +5,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AccountContext } from '../context/AccountProvider';
-import { getCommunication, getUsers } from '../../service/api.js';
+import { getCommunication, getMessages, getUsers } from '../../service/api.js';
 import { selectChat, deselectChat, clearSelectedChats } from '../features/chats/chatSlice.js';
 import { setCommunication } from '../../service/api.js';
 import { useMediaQuery } from 'react-responsive';
@@ -38,8 +38,6 @@ function SideBarChats({ searchQueries }) {
 
                 if (isMounted) {
                     const filteredUsers = response.filter(user => user.sub !== accounts.sub);
-
-
                     setUsers(filteredUsers);
 
 
@@ -62,10 +60,6 @@ function SideBarChats({ searchQueries }) {
 
 
 
-
-
-
-
     const getUser = async (user) => {
 
         setPerson(user)
@@ -73,6 +67,7 @@ function SideBarChats({ searchQueries }) {
             senderId: accounts?.sub,
             reciverId: user?.sub
         })
+
         setIsChatOpen(true);
 
         setIsMobileScreen(isMobile);
@@ -83,18 +78,18 @@ function SideBarChats({ searchQueries }) {
         });
 
     }
-    const handleSelection = (user) => {
-        if (selectedChatIds.includes(user.sub)) {
-            dispatch(deselectChat(user.sub));
-        } else {
-            dispatch(selectChat(user.sub));
-        }
-    };
+    // const handleSelection = (user) => {
+    //     if (selectedChatIds.includes(user.sub)) {
+    //         dispatch(deselectChat(user.sub));
+    //     } else {
+    //         dispatch(selectChat(user.sub));
+    //     }
+    // };
 
-    const handleDeleteSelected = () => {
-        setUsers(users.filter(user => !selectedChatIds.includes(user.sub)));
-        dispatch(clearSelectedChats());
-    };
+    // const handleDeleteSelected = () => {
+    //     setUsers(users.filter(user => !selectedChatIds.includes(user.sub)));
+    //     dispatch(clearSelectedChats());
+    // };
 
     const searchFilteredUsers = users.filter(user =>
         user.name && user.name.toLowerCase().includes(searchQueries.toLowerCase())
@@ -110,28 +105,65 @@ function SideBarChats({ searchQueries }) {
 
 
 
+    // useEffect(() => {
+    //     const fetchLatestMessages = async () => {
+    //         const messages = {};
+    //         for (const user of users) {
+
+    //             var data = await getCommunication({
+    //                 senderId: accounts.sub,
+    //                 reciverId: user.sub,
+    //             });
+    //             console.log("get communication Response :", data);
+
+    //             messages[user.sub] = {
+    //                 text: data?.message,
+    //                 timestamp: data?.updatedAt
+    //             };
+    //         }
+    //         setLatestMessages(messages);
+    //     };
+    //     if (users.length > 0) {
+    //         fetchLatestMessages();
+    //     }
+    // }, [users, accounts.sub, newMessageFlag]);
+
     useEffect(() => {
         const fetchLatestMessages = async () => {
             const messages = {};
+
+
             for (const user of users) {
                 const data = await getCommunication({
-                    senderID: accounts.sub,
-                    reciverID: user.sub,
+                    senderId: accounts.sub,
+                    reciverId: user.sub,
                 });
+
+
+
+                const communicationId = data?.communication?._id;
+                console.log("Communication ID:", communicationId);
+
                 messages[user.sub] = {
                     text: data?.message,
-                    timestamp: data?.updatedAt
+                    timestamp: data?.updatedAt,
+                    communicationId: communicationId
                 };
+
+                console.log("messages :", messages);
             }
+
             setLatestMessages(messages);
         };
+
         if (users.length > 0) {
             fetchLatestMessages();
         }
     }, [users, accounts.sub, newMessageFlag]);
 
+
     useEffect(() => {
-        if (searchQueries.length >0) {
+        if (searchQueries.length > 0) {
             const filtered = updatedUser.filter((user) => user.name.toLowerCase().includes(searchQueries.toLowerCase()));
             setFilteredUsers(filtered);
         } else {
@@ -154,10 +186,9 @@ function SideBarChats({ searchQueries }) {
 
                 {filteredUsers.sort((a, b) => b.lastMessageTime - a.lastMessageTime).map((user) => (
                     <>
-
                         <div className="main-sidebarChat mt-2 text-white d-flex justify-content-between  p-2" onClick={() => getUser(user)}>
                             <div className="sidebarChat-avatar ">
-                                <Avatar src={user.picture} sx={{ fontSize: '40px' }} />
+                                <Avatar src={user?.picture} sx={{ fontSize: '40px' }} />
                             </div>
                             <div className="Right-sidebarChat d-flex justify-content-between">
 
@@ -166,7 +197,16 @@ function SideBarChats({ searchQueries }) {
                                         <p>{user.name}</p>
                                     </div>
                                     <div className="user-details ">
-                                        <p>{latestMessages[user?.sub]?.text?.includes('localhost') ? 'media' : latestMessages[user?.sub]?.text || 'No message yet'}</p>
+                                        <p>
+                                            {/* {latestMessages[user?.sub]
+                                                ? latestMessages[user.sub].text
+                                                    ? latestMessages[user.sub].text.includes('localhost')
+                                                        ? 'media'
+                                                        : latestMessages[user.sub].text
+                                                    : 'No message yet'
+                                                : 'No message yet'} */}
+                                            {latestMessages[user?.sub]?.text?.includes('localhost') ? 'media' : latestMessages[user?.sub]?.text || 'No message yet'}
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="section2 d-flex flex-column align-items-center">
@@ -182,64 +222,7 @@ function SideBarChats({ searchQueries }) {
                         </div>
                     </>
                 ))}
-                {/* </div> */}
 
-                {/* {searchFilteredUsers > 0 ? searchFilteredUsers.map(user =>
-                (<>
-                    <div className="main-sidebarChat mt-2 text-white d-flex justify-content-between  p-2" onClick={() => getUser(user)}>
-                        <div className="sidebarChat-avatar ">
-                            <Avatar src={user.picture} sx={{ fontSize: '40px' }} />
-                        </div>
-                        <div className="Right-sidebarChat d-flex justify-content-between">
-
-                            <div className="setion1">
-                                <div className="user-name text-white">
-                                    <p>{user.name}</p>
-                                </div>
-                                <div className="user-details ">
-                                    <p>{latestMessages[user?.sub]?.text?.includes('localhost') ? 'media' : latestMessages[user?.sub]?.text || 'No message yet'}</p>
-                                </div>
-                            </div>
-                            <div className="section2 d-flex flex-column align-items-center">
-                                <div className="user-more-timing">
-                                    <p>{latestMessages[user.sub]?.timestamp ? formatDate(latestMessages[user?.sub]?.timestamp) : 'Today'}</p>
-                                </div>
-                                <div className="user-status">
-                                    <ExpandMoreIcon className='sidebar-icons' />
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </>
-
-                )) : updatedUser.map(user => (
-                    <div key={user.sub} className="main-sidebarChat mt-2 text-white d-flex justify-content-between  p-2" onClick={() => getUser(user)}>
-                        <div className="sidebarChat-avatar ">
-                            <Avatar src={user.picture} sx={{ fontSize: '40px' }} />
-                        </div>
-                        <div className="Right-sidebarChat d-flex justify-content-between">
-
-                            <div className="setion1">
-                                <div className="user-name text-white">
-                                    <p>{user.name}</p>
-                                </div>
-                                <div className="user-details ">
-                                    <p>{latestMessages[user?.sub]?.text?.includes('localhost') ? 'media' : latestMessages[user?.sub]?.text || 'No message yet'}</p>
-                                </div>
-                            </div>
-                            <div className="section2 d-flex flex-column align-items-center">
-                                <div className="user-more-timing">
-                                    <p>{latestMessages[user.sub]?.timestamp ? formatDate(latestMessages[user?.sub]?.timestamp) : 'Today'}</p>
-                                </div>
-                                <div className="user-status">
-                                    <ExpandMoreIcon className='sidebar-icons' />
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                ))} */}
 
             </div >
         </>
