@@ -8,7 +8,7 @@ export const addUser = async (data) => {
 
 
     try {
-        await axios.post(`${url}/add`, data, { withCredentials: false })
+        await axios.post(`${url}/add`, data)
         console.log(data);
 
     } catch (error) {
